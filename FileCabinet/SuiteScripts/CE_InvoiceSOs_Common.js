@@ -62,12 +62,19 @@ define(['N/currentRecord', 'N/file', 'N/format/i18n', 'N/query', 'N/record', 'N/
         //gets landing page sublist data (sales order, customer, amount, so status)
         function getData(request) {
             let filteredCustomers = request.parameters.customers_filtered;
-
-            log.debug('filtered customers at 65', filteredCustomers);
-            log.debug('filtered customers at 65 type', typeof filteredCustomers);
-
-
             let status = request.parameters.status;
+            let greaterThan = request.parameters.greater;
+            let lessThan = request.parameters.less;
+
+            //always comes through as a string; if no value entered in field, comes through as empty string<>
+            log.debug('greaterThan', greaterThan);
+            log.debug('greaterThan typeof ', typeof greaterThan);
+
+            log.debug('lessThan', lessThan);
+            log.debug('lessThan typeof ', typeof lessThan);
+
+
+
             let customFilterQuery;
             let statusQuery;
             
@@ -86,7 +93,6 @@ define(['N/currentRecord', 'N/file', 'N/format/i18n', 'N/query', 'N/record', 'N/
                 statusQuery = `('Sales Order : Pending Billing')`
             }
 
-            log.debug('statusQuery 89', statusQuery)
             // Adds any customer filter data to original baseQuery
             if (filteredCustomers !== 'AAA' && filteredCustomers !== undefined && filteredCustomers.length !== 0) {
                 let custIds = filteredCustomers.split(',').map(e => e = parseInt(e));
@@ -167,12 +173,32 @@ define(['N/currentRecord', 'N/file', 'N/format/i18n', 'N/query', 'N/record', 'N/
                 multiSelect.defaultValue = request.parameters['customers_filtered'];
             }
 
+            let amountGreaterThan = form.addField({
+                id : 'custpage_greaterthan',
+                type : serverWidget.FieldType.CURRENCY,
+                label : 'Amount: Greater Than'
+            });
+
+            amountGreaterThan.updateBreakType({
+                breakType : serverWidget.FieldBreakType.STARTCOL
+            });
+
+            let amountLessThan = form.addField({
+                id : 'custpage_lessthan',
+                type : serverWidget.FieldType.CURRENCY,
+                label : 'Amount: Less Than'
+            });
+
             // status dropdown/select
 
             let selectStatusField = form.addField({
                 id : 'custpage_selectstatus',
                 type : serverWidget.FieldType.SELECT,
                 label : 'Status'
+            });
+
+            selectStatusField.updateBreakType({
+                breakType : serverWidget.FieldBreakType.STARTCOL
             });
 
             selectStatusField.addSelectOption({
@@ -198,7 +224,9 @@ define(['N/currentRecord', 'N/file', 'N/format/i18n', 'N/query', 'N/record', 'N/
                 text : 'Pending Billing'
             });
 
-            //                                    ('Sales Order : Partially Fulfilled', 'Sales Order : Pending Billing/Partially Fulfilled ', 'Sales Order : Pending Billing')`
+
+
+
 
 
 

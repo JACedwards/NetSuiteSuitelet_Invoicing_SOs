@@ -15,49 +15,12 @@ define(['N/currentRecord', 'N/record'],
 
     function(currentRecord, record) {
         
-        //filters sales orders by customer
-        // function filterCustomers (event) {
-        //     let url = window.location.href;
-        //     let urlBase = findBaseUrl(url);
-        //     let currentRec = currentRecord.get();
-        //     let customers = currentRec.getValue({
-        //         fieldId: 'custpage_multiselect'
-        //     });
-    
-        //     /** handles error if user clicks Customer Filter button, without 
-        //         selecting customers. */
-        //     if (customers[0] === ''){
-        //         debugger;
-        //         window.location.href = urlBase + '&customers_filtered=AAA';
-        //     }
-
-        //     else{
-        //         customers = customers.join(',');
-        //         window.onbeforeunload = null;
-        //         window.location.href = urlBase + '&customers_filtered=' + customers;
-        //     }
-        // }
-
-        // function filterStatus (event) {
-        //     let url = window.location.href;
-        //     let urlBase = findBaseUrl(url);
-        //     let currentRec = currentRecord.get();
-        //     let status = currentRec.getValue({
-        //         fieldId: 'custpage_selectstatus'
-        //     });
-        //     // debugger;
-        //     // console.log('status', status);
-        //     window.onbeforeunload = null;
-        //     window.location.href = urlBase + '&status=' + status;
-        // }
-
-        //combining both customer and status filters
-
         function filterAll (event) {
             debugger;
             let url = window.location.href;
             let urlBase = findBaseUrl(url);
             let currentRec = currentRecord.get();
+            
             let customers = currentRec.getValue({
                 fieldId: 'custpage_multiselect'
             });
@@ -67,10 +30,25 @@ define(['N/currentRecord', 'N/record'],
             let status = currentRec.getValue({
                 fieldId: 'custpage_selectstatus'
             });
-            let statusURL = '&status=' + status
-    
+            let statusURL = '&status=' + status;
+
+            let amountGreaterThan = currentRec.getValue({
+                fieldId: 'custpage_greaterthan'
+            });
+            let greaterURL = '&greater=' + amountGreaterThan;
+
+            let amountLessThan = currentRec.getValue({
+                fieldId: 'custpage_lessthan'
+            });
+            let lessURL = '&less=' + amountLessThan;
+
+
+            console.log('amountGreaterThan', amountGreaterThan); // empty strings on first load
+            console.log('amountGreaterThan Type', typeof amountGreaterThan);
+            console.log('amountLessThan', amountLessThan);
+  
             window.onbeforeunload = null;
-            window.location.href = urlBase + customerURL + statusURL;
+            window.location.href = urlBase + customerURL + statusURL + greaterURL + lessURL;
         }
 
         /** Error handling when user clicks Invoice All button without having checked any sales orders to invoice*/
