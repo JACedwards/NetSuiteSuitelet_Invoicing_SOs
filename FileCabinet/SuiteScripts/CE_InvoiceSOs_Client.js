@@ -41,11 +41,6 @@ define(['N/currentRecord', 'N/record'],
                 fieldId: 'custpage_lessthan'
             });
             let lessURL = '&less=' + amountLessThan;
-
-
-            console.log('amountGreaterThan', amountGreaterThan); // empty strings on first load
-            console.log('amountGreaterThan Type', typeof amountGreaterThan);
-            console.log('amountLessThan', amountLessThan);
   
             window.onbeforeunload = null;
             window.location.href = urlBase + customerURL + statusURL + greaterURL + lessURL;
@@ -87,18 +82,11 @@ define(['N/currentRecord', 'N/record'],
 
             }
         }
-    
 
-        //Clears customer multi-select (because built-in Reset button didn't work).
-        function clearCustomers (event) {
-            let url = window.location.href;
-            let urlBase = findBaseUrl(url);
-            console.log('urlBase', urlBase);
-            window.location.href = urlBase
-        }
 
-        // No longer needed due to simpler method of storing/accessing base URL
-        //      on custom record.
+        //  <>Storing suitelet url on custom record, so can update this function by grabbling
+        //  complete url from custom record and slicing off bit after /app. 
+        //  already created this type of function in Common file.
         function findBaseUrl(url){
 
             let l = 0;
@@ -119,12 +107,8 @@ define(['N/currentRecord', 'N/record'],
                 }
             }
         
-            console.log('baseUrl if block = ' + baseUrl)
-            console.log('equalSign = ' + equalSign)
-        
             flag = true
             while (flag) {
-        
         
                 if (url[equalSign] === '&'){
                     url = url.slice(0, equalSign)
@@ -159,10 +143,7 @@ define(['N/currentRecord', 'N/record'],
     return {
         pageInit: pageInit,
         filterAll: filterAll,
-        // filterCustomers : filterCustomers,
-        // filterStatus: filterStatus,
         noSelections : noSelections,
-        clearCustomers : clearCustomers,
         findBaseUrl : findBaseUrl
         };
     

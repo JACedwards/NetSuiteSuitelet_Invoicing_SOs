@@ -63,23 +63,14 @@ define(['N/currentRecord', 'N/file', 'N/format/i18n', 'N/query', 'N/record', 'N/
         function getData(request) {
             let filteredCustomers = request.parameters.customers_filtered;
             let status = request.parameters.status;
-            let greaterThan = request.parameters.greater;
-            let lessThan = request.parameters.less;
+            let greaterThan = request.parameters.greater || '';
 
-            //always comes through as a string; if no value entered in field, comes through as empty string<>
-            log.debug('greaterThan', greaterThan);
-            log.debug('greaterThan typeof ', typeof greaterThan);
-
-            log.debug('lessThan', lessThan);
-            log.debug('lessThan typeof ', typeof lessThan);
-
-
+            let lessThan = request.parameters.less || '';
 
             let customFilterQuery;
             let statusQuery;
-            
-            log.debug('status 69', status);
-            //Adds filter by status to query string
+
+            // filter by status
             if (status == undefined || status == '0') {
                 statusQuery = `('Sales Order : Partially Fulfilled', 'Sales Order : Pending Billing/Partially Fulfilled ', 'Sales Order : Pending Billing')`
             }
@@ -93,7 +84,7 @@ define(['N/currentRecord', 'N/file', 'N/format/i18n', 'N/query', 'N/record', 'N/
                 statusQuery = `('Sales Order : Pending Billing')`
             }
 
-            // Adds any customer filter data to original baseQuery
+            // filter by customer
             if (filteredCustomers !== 'AAA' && filteredCustomers !== undefined && filteredCustomers.length !== 0) {
                 let custIds = filteredCustomers.split(',').map(e => e = parseInt(e));
                 customFilterQuery = ` AND entity IN (${custIds})`
@@ -107,22 +98,26 @@ define(['N/currentRecord', 'N/file', 'N/format/i18n', 'N/query', 'N/record', 'N/
                                 recordtype = 'salesorder'  
                             AND 
                                 BUILTIN.DF(status) 
-                                IN ` 
-                                    
-                                
-            log.debug('customFilterQuery', customFilterQuery);
-            log.debug('customFilterQuery type', typeof customFilterQuery);
-
-            baseQuery = baseQuery + statusQuery;
-            log.debug('basequery + statusQuery', baseQuery)
-
+                                    IN ${statusQuery}` 
+            
 
             if (customFilterQuery !== undefined && filteredCustomers.length !== 0) {
-                log.debug('hitting line 92 - adding customquery', 'hitting line 92 - adding customquery')
                 baseQuery += customFilterQuery;
-            }
-            log.debug('complete query 113', baseQuery)
+                }
 
+            //Filter by amount greater than                   
+            if (greaterThan.length != 0) {
+                baseQuery = baseQuery + 
+                `AND
+                    foreigntotal > ${parseInt(greaterThan)}`
+            }
+            //Filter by amount less than                   
+            if (lessThan.length != 0) {
+                baseQuery = baseQuery + 
+                `AND
+                    foreigntotal < ${parseInt(lessThan)}`
+            }
+            
             const results = query.runSuiteQLPaged({
                 query: baseQuery
             });
@@ -144,7 +139,6 @@ define(['N/currentRecord', 'N/file', 'N/format/i18n', 'N/query', 'N/record', 'N/
             });
             return true;
             });
-            // log.debug('objectArray',objectArray);
             return objectArray;
         }
 
@@ -159,7 +153,7 @@ define(['N/currentRecord', 'N/file', 'N/format/i18n', 'N/query', 'N/record', 'N/
 
             form.addSubmitButton({
                 id : 'invoice_all',
-                label : 'Invoice All Selected SOs in List',
+                label : 'Invoice Selected Sales Orders',
             });
 
             let multiSelect = form.addField({
@@ -179,6 +173,11 @@ define(['N/currentRecord', 'N/file', 'N/format/i18n', 'N/query', 'N/record', 'N/
                 label : 'Amount: Greater Than'
             });
 
+            if (request !== undefined) { // enables greater than amount filter data to persist across multiple filtering attempts
+                amountGreaterThan.defaultValue = request.parameters['greater'];
+            }
+            
+
             amountGreaterThan.updateBreakType({
                 breakType : serverWidget.FieldBreakType.STARTCOL
             });
@@ -189,6 +188,10 @@ define(['N/currentRecord', 'N/file', 'N/format/i18n', 'N/query', 'N/record', 'N/
                 label : 'Amount: Less Than'
             });
 
+            if (request !== undefined) { // enables less than amount filter data to persist across multiple filtering attempts
+                amountLessThan.defaultValue = request.parameters['less'];
+            }
+
             // status dropdown/select
 
             let selectStatusField = form.addField({
@@ -196,6 +199,10 @@ define(['N/currentRecord', 'N/file', 'N/format/i18n', 'N/query', 'N/record', 'N/
                 type : serverWidget.FieldType.SELECT,
                 label : 'Status'
             });
+
+            if (request !== undefined) { // enables status filter data to persist across multiple filtering attempts
+                selectStatusField.defaultValue = request.parameters['status'];
+            }
 
             selectStatusField.updateBreakType({
                 breakType : serverWidget.FieldBreakType.STARTCOL
@@ -225,38 +232,12 @@ define(['N/currentRecord', 'N/file', 'N/format/i18n', 'N/query', 'N/record', 'N/
             });
 
 
-
-
-
-
-
-            // substituted this for a "Filter" button which handles filtering both by customer and status (only issue is it doesn't give error message if filter is pressed without having selected any customer)
-            // form.addButton({
-            //     id : 'filter',
-            //     label : 'Filter by Customer',
-            //     functionName : 'filterCustomers'
-            // });
-
-            form.addButton({  //New status filter button
+            form.addButton({ 
                 id : 'filter_status',
                 label : 'Filter',
                 functionName : 'filterAll'
             });
             
-            form.addButton({ //clears customer multi-select field when customers filtered more than once.
-                id: 'clear_cust_filter',
-                label : 'Clear Customer Filter',
-                functionName : 'clearCustomers'
-            });
-
-            //<>Do we need a button to "clear" status dropdown since it can easily be set back to blank?
-
-
-            
-
-            
-            
-
             const soSublist = form.addSublist({
                 id : 'custpage_sales_orders',
                 label: 'Sales Orders',
@@ -318,22 +299,32 @@ define(['N/currentRecord', 'N/file', 'N/format/i18n', 'N/query', 'N/record', 'N/
                 });
                             
             const data = salesOrderData;
+            let baseURL = getAccountURL();
+
 
             data.forEach((datum, index) => {
                 soSublist.setSublistValue({
                     id: 'sales_order_num',
                     line: index,
-                    value: datum.numberSO
+                    value: `
+                    <a style="font-family: 'Open Sans', sans-serif; margin-left: 30px; margin-top: -20px" target="_blank" href="${baseURL}/app/accounting/transactions/salesord.nl?id=${datum.soInternalId}">${datum.numberSO}</a>           
+                    `
                 });
                 soSublist.setSublistValue({
                     id: 'status',
                     line: index,
-                    value: datum.status.slice(14)
+                    value: 
+                    `
+                    <a style="font-family: 'Open Sans', sans-serif; margin-top: -20px" >${datum.status.slice(14)}</a>           
+                    `
                 });
                 soSublist.setSublistValue({
                     id: 'customer',
                     line: index,
-                    value: datum.customer
+                    value: 
+                    `
+                    <a style="font-family: 'Open Sans', sans-serif; margin-left: -35px; margin-top: -20px" >${datum.customer}</a>           
+                    `
                 });
 
                 // (formats numbers as currency)
@@ -342,7 +333,10 @@ define(['N/currentRecord', 'N/file', 'N/format/i18n', 'N/query', 'N/record', 'N/
                 soSublist.setSublistValue({
                     id: 'amount',
                     line: index,
-                    value: amount
+                    value: 
+                    `
+                    <a style="font-family: 'Open Sans', sans-serif; margin-top: -20px" >${amount}</a>           
+                    `
                 });
 
                 soSublist.setSublistValue({
@@ -414,6 +408,8 @@ define(['N/currentRecord', 'N/file', 'N/format/i18n', 'N/query', 'N/record', 'N/
                 id : 'custpage_invoices'
                 });
                             
+            let baseURL = getAccountURL();
+            
             let data = getInvoiceData();
             data = JSON.parse(data);
 
@@ -423,7 +419,7 @@ define(['N/currentRecord', 'N/file', 'N/format/i18n', 'N/query', 'N/record', 'N/
                     id: 'so',
                     line: index,
                     value: `
-                        <a style="font-family: 'Open Sans', sans-serif; margin-left: 50px; padding-top: -10px" target="_blank" href="https://td2892040.app.netsuite.com/app/accounting/transactions/salesord.nl?id=${datum.pair[3]}">${datum.pair[0]}</a>           
+                        <a style="font-family: 'Open Sans', sans-serif; margin-left: 50px; padding-top: -10px" target="_blank" href="${baseURL}/app/accounting/transactions/salesord.nl?id=${datum.pair[3]}">${datum.pair[0]}</a>           
                     `
                 });
 
@@ -431,7 +427,7 @@ define(['N/currentRecord', 'N/file', 'N/format/i18n', 'N/query', 'N/record', 'N/
                     id: 'invoice_num',
                     line: index,
                     value:  `
-                        <a style="font-family: 'Open Sans', sans-serif; margin-left: 48px; padding-top: -10px"target="_blank" href="https://td2892040.app.netsuite.com/app/accounting/transactions/custinvc.nl?id=${datum.pair[2]}">${datum.pair[1]}</a>
+                        <a style="font-family: 'Open Sans', sans-serif; margin-left: 48px; padding-top: -10px"target="_blank" href="${baseURL}/app/accounting/transactions/custinvc.nl?id=${datum.pair[2]}">${datum.pair[1]}</a>
                     ` 
                 });
             })
@@ -608,6 +604,23 @@ define(['N/currentRecord', 'N/file', 'N/format/i18n', 'N/query', 'N/record', 'N/
                 pageObject: form
             });
         }
+
+        function getAccountURL () {
+
+            const fetchSuiteletUrl = record.load({
+                type : 'customrecord_ce_inv_mr_results',
+                id: 1
+            });
+
+            let suiteletUrl = fetchSuiteletUrl.getValue({
+                fieldId : 'custrecord_suitlet_base_url'
+            });
+
+            let baseURL = suiteletUrl.split('/app');
+
+            return baseURL[0];
+
+        } 
                
     //<>Some of these won't need to be returned since only being used within this file now.
     return {
@@ -626,6 +639,7 @@ define(['N/currentRecord', 'N/file', 'N/format/i18n', 'N/query', 'N/record', 'N/
         mrProcessingComplete : mrProcessingComplete,
         mrStillProcessing : mrStillProcessing,
         errorNoCustomersToFilter : errorNoCustomersToFilter,
+        getAccountURL: getAccountURL
  
     }
         
