@@ -139,6 +139,8 @@ define(['N/currentRecord', 'N/file', 'N/format/i18n', 'N/query', 'N/record', 'N/
             });
             return true;
             });
+            log.debug('objectArray at commmon 143', objectArray)
+
             return objectArray;
         }
 
@@ -303,12 +305,11 @@ define(['N/currentRecord', 'N/file', 'N/format/i18n', 'N/query', 'N/record', 'N/
 
 
             data.forEach((datum, index) => {
+                log.debug('sales order number at common 308', datum.numberSO)
                 soSublist.setSublistValue({
                     id: 'sales_order_num',
                     line: index,
-                    value: `
-                    <a style="font-family: 'Open Sans', sans-serif; margin-left: 30px; margin-top: -20px" target="_blank" href="${baseURL}/app/accounting/transactions/salesord.nl?id=${datum.soInternalId}">${datum.numberSO}</a>           
-                    `
+                    value: datum.numberSO
                 });
                 soSublist.setSublistValue({
                     id: 'status',
@@ -454,6 +455,7 @@ define(['N/currentRecord', 'N/file', 'N/format/i18n', 'N/query', 'N/record', 'N/
 
             return soCheckBoxesArray;
         }  
+        
         
         //Runs map/reduce
         function runMapReduce(soIdAndNumber) {

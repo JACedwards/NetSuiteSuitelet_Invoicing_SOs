@@ -94,6 +94,8 @@ define(['N/file', 'N/render', 'N/search', 'N/record', 'N/ui/serverWidget', 'N/ta
                 //Processes data from landing page form
                 let selectedSalesOrders = request.parameters.custpage_sales_ordersdata;
                 let soData = common.salesOrderSelectionData(selectedSalesOrders);  
+
+                log.debug('soIdAndNumber AT SUITLET 98', soData.soIdAndNumber)
                 
                 // If no Sales Orders have been checked before the Invoicing button
                 //      is clicked, renders page with error message and button to return
@@ -104,7 +106,7 @@ define(['N/file', 'N/render', 'N/search', 'N/record', 'N/ui/serverWidget', 'N/ta
 
                 else {
                 
-                //Runs map/reduce
+                // Runs map/reduce
                 common.runMapReduce(soData.soIdAndNumber);
                 }
     
