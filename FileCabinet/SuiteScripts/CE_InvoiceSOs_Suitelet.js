@@ -38,13 +38,13 @@ define(['N/file', 'N/render', 'N/search', 'N/record', 'N/ui/serverWidget', 'N/ta
                 if (letterCheck == 'AAA') {
                     common.errorNoCustomersToFilter(response);
                 }
-                else if (mrTask) { //checks if map/reduce has started running
+                else if (mrTask) { //check if map/reduce has started running
 
                     let statusOfMr = task.checkStatus({
                         taskId: mrTask
                     });
 
-                    // writes final invoice page
+                    // write final invoice page
                     if (statusOfMr.status === 'COMPLETE') {   
                         const finalInvoiceForm = common.initializeFinalForm();
                         common.populateFinalSublist(finalInvoiceForm);                        
@@ -56,7 +56,7 @@ define(['N/file', 'N/render', 'N/search', 'N/record', 'N/ui/serverWidget', 'N/ta
                 }
                 else{  
 
-                    //Stores landing page url of suitelet, on custom record,for use by client script
+                    //Store landing page url of suitelet, on custom record,for use by client script
                     let acctId = runtime.accountId;
                     let currScript = runtime.getCurrentScript();
                     let scriptUrl = url.resolveScript({
@@ -71,15 +71,15 @@ define(['N/file', 'N/render', 'N/search', 'N/record', 'N/ui/serverWidget', 'N/ta
                     });
                     common.storeSuiteletUrl(acctId, scriptUrl, acctUrl);
                     
-                    //Writes landing page
+                    //Write landing page
                     
-                    //initializes landing page form
+                    //Initializes landing page form
                     const invoiceForm = common.initializeForm(context, request);
 
-                    //gathers data for landing page form
+                    //Gather data for landing page form
                     const salesOrderData = common.getData(request);
 
-                    // populates landing page form
+                    // Populates landing page form
                     common.populateLandingForm(invoiceForm, request, salesOrderData);
 
                     //writes landing page form

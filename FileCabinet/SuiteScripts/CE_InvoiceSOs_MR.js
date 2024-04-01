@@ -80,8 +80,8 @@ define(['N/query', 'N/record', 'N/runtime'],
                     enableSourcing: true,
                 });
 
-                //Loads new invoice and grabs its id and number and puts in object:
-                //      {pair: [sales order number, invoice number, invoice id, sales order id}]
+                //Load new invoice, grab its id and number, and put in object:
+                //      {pair: [sales order number, invoice number, invoice id, sales order id}
                 let invoiceRecord = record.load({
                     type: record.Type.INVOICE,
                     id : invoiceId,
@@ -96,8 +96,8 @@ define(['N/query', 'N/record', 'N/runtime'],
                 
                 let SoAndInvoiceNumber = {'pair' : [salesOrderIdWithNum[1], parseInt(invoiceNum), parseInt(idInvoice), salesOrderIdWithNum[0]]}
 
-                // Loads custom record. Grabs above 'pair' arrays from record. 
-                //      Adds array from this iteration of map and saves.
+                // Load custom record. Grab above 'pair' array from record. 
+                //      Add array from this iteration of map and saves.
                 // This allows the final page of the suitelet to use these numbers/ids to
                 //      (1) associate the sales order with its new invoice, and
                 //      (2) make SO and Invoice numbers live links to those records.
