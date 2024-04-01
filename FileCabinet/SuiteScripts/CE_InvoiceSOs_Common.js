@@ -288,6 +288,25 @@ define(['N/currentRecord', 'N/file', 'N/format/i18n', 'N/query', 'N/record', 'N/
                 displayType : serverWidget.FieldDisplayType.HIDDEN
             });
 
+            let salesOrderNumHiddenField = soSublist.addField({ //passes SO number to allow live link
+                id: 'custpage_so_num_hidden',
+                label: 'Hidden Sales Order Numbers',
+                type: serverWidget.FieldType.TEXT,
+                });
+            salesOrderNumHiddenField.updateDisplayType({
+                displayType : serverWidget.FieldDisplayType.HIDDEN
+            });
+
+            //Will need to change query to get entity id; right now just getting builtin text version??<>
+            let customerHiddenField = soSublist.addField({ //passes customer ID number to allow live link
+                id: 'custpage_customer_id_hidden',
+                label: 'Customer Id',
+                type: serverWidget.FieldType.TEXT,
+                });
+            customerHiddenField.updateDisplayType({
+                displayType : serverWidget.FieldDisplayType.HIDDEN
+            });
+
             return form;
         }  
 
@@ -305,12 +324,14 @@ define(['N/currentRecord', 'N/file', 'N/format/i18n', 'N/query', 'N/record', 'N/
 
 
             data.forEach((datum, index) => {
-                log.debug('sales order number at common 308', datum.numberSO)
                 soSublist.setSublistValue({
                     id: 'sales_order_num',
                     line: index,
-                    value: datum.numberSO
-                });
+                    value: 
+                    `
+                    <a style="font-family: 'Open Sans', sans-serif; margin-left: 27px; margin-top: -20px" target="_blank" href="${baseURL}/app/accounting/transactions/salesord.nl?id=${datum.soInternalId}">${datum.numberSO}</a>  
+                    `
+                    });
                 soSublist.setSublistValue({
                     id: 'status',
                     line: index,
@@ -324,7 +345,7 @@ define(['N/currentRecord', 'N/file', 'N/format/i18n', 'N/query', 'N/record', 'N/
                     line: index,
                     value: 
                     `
-                    <a style="font-family: 'Open Sans', sans-serif; margin-left: -35px; margin-top: -20px" >${datum.customer}</a>           
+                    <a style="font-family: 'Open Sans', sans-serif; margin-left: -35px; margin-top: -20px" target="_blank" href="${baseURL}/app/common/entity/custjob.nl?id=${datum.customerID}">${datum.customer}</a>  
                     `
                 });
 
@@ -344,6 +365,20 @@ define(['N/currentRecord', 'N/file', 'N/format/i18n', 'N/query', 'N/record', 'N/
                     id: 'custpage_so_internal_id',
                     line: index,
                     value: datum.soInternalId
+                });
+
+                
+                soSublist.setSublistValue({
+                    id: 'custpage_so_num_hidden',
+                    line: index,
+                    value: datum.numberSO
+                });
+
+                
+                soSublist.setSublistValue({
+                    id: 'custpage_customer_id_hidden',
+                    line: index,
+                    value: datum.customerID
                 });
             })
 
@@ -452,7 +487,7 @@ define(['N/currentRecord', 'N/file', 'N/format/i18n', 'N/query', 'N/record', 'N/
                 soCheckBoxesArray.push(tempString);
                 tempString = []
             }
-
+            log.debug('soCheckBoxesArray from 487 inside soSelection Processing', soCheckBoxesArray)
             return soCheckBoxesArray;
         }  
         
@@ -511,13 +546,14 @@ define(['N/currentRecord', 'N/file', 'N/format/i18n', 'N/query', 'N/record', 'N/
         function salesOrderSelectionData(soCheckBoxes){
 
             let soCheckBoxesArray = soSelectionProcessing(soCheckBoxes);
+            log.debug('common 546 soCjheckBoxesArray inside salesOrderSelectionData()', soCheckBoxesArray);
             let soOrderNums = []
             let soIdAndNumber = []
 
             for (let k = 0; k < soCheckBoxesArray.length; k++){
                 if (soCheckBoxesArray[k][0] === "T"){
-                    soOrderNums.push(soCheckBoxesArray[k][1])
-                    soIdAndNumber.push([parseInt(soCheckBoxesArray[k][5]), parseInt(soCheckBoxesArray[k][1])])
+                    soOrderNums.push(soCheckBoxesArray[k][6])
+                    soIdAndNumber.push([parseInt(soCheckBoxesArray[k][5]), parseInt(soCheckBoxesArray[k][6])])
                 }
             }
             soOrderNums = soOrderNums.join(', ')
