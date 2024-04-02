@@ -628,20 +628,20 @@ define(['N/currentRecord', 'N/file', 'N/format/i18n', 'N/query', 'N/record', 'N/
             });
         }
 
-        function errorNoCustomersToFilter(response){
-            const form = serverWidget.createForm({
-                title : 'Before using the "Filter by Customer" button, please choose customers in the CUSTOMER FILTER box.'
-            });
-            form.clientScriptModulePath = '/SuiteScripts/CE_Invoice_SalesOrders_Suitelet/CE_InvoiceSOs_Client.js' 
-            form.addButton({
-                id : 'filter',
-                label : 'Return to Invoicing Page',
-                functionName : 'noSelections'
-            });
-            response.writePage({
-                pageObject: form
-            });
-        }
+        // function errorNoCustomersToFilter(response){
+        //     const form = serverWidget.createForm({
+        //         title : 'Before using the "Filter by Customer" button, please choose customers in the CUSTOMER FILTER box.'
+        //     });
+        //     form.clientScriptModulePath = '/SuiteScripts/CE_Invoice_SalesOrders_Suitelet/CE_InvoiceSOs_Client.js' 
+        //     form.addButton({
+        //         id : 'filter',
+        //         label : 'Return to Invoicing Page',
+        //         functionName : 'noSelections'
+        //     });
+        //     response.writePage({
+        //         pageObject: form
+        //     });
+        // }
 
         function getAccountURL () {
 
@@ -676,7 +676,7 @@ define(['N/currentRecord', 'N/file', 'N/format/i18n', 'N/query', 'N/record', 'N/
         errorNoSoSelects : errorNoSoSelects,
         mrProcessingComplete : mrProcessingComplete,
         mrStillProcessing : mrStillProcessing,
-        errorNoCustomersToFilter : errorNoCustomersToFilter,
+        // errorNoCustomersToFilter : errorNoCustomersToFilter,
         getAccountURL: getAccountURL
  
     }

@@ -15,10 +15,10 @@ define(['N/currentRecord', 'N/record'],
 
     function(currentRecord, record) {
         
+        // Filter Sales Orders by any combination of customer, amount range, status
         function filterAll (event) {
-            debugger;
-            let url = window.location.href;
-            let urlBase = findBaseUrl(url);
+
+            let urlBase = getBaseURL();
             let currentRec = currentRecord.get();
             
             let customers = currentRec.getValue({
@@ -48,7 +48,7 @@ define(['N/currentRecord', 'N/record'],
 
         /** Error handling when user clicks Invoice All button without having checked any sales orders to invoice*/
         
-        //Gets base URL from custom record to simplify functions in this file
+        //Get base URL from custom record to simplify functions in this file
         function noSelections (event) {
 
             const fetchSuiteletUrl = record.load({
@@ -83,49 +83,18 @@ define(['N/currentRecord', 'N/record'],
             }
         }
 
+        function getBaseURL() {
+            const fetchSuiteletUrl = record.load({
+                type : 'customrecord_ce_inv_mr_results',
+                id: 1
+            });
 
-        //  <>Storing suitelet url on custom record, so can update this function by grabbling
-        //  complete url from custom record and slicing off bit after /app. 
-        //  already created this type of function in Common file.
-        function findBaseUrl(url){
+            let suiteletUrl = fetchSuiteletUrl.getValue({
+                fieldId : 'custrecord_suitlet_base_url'
+            });
 
-            let l = 0;
-            let r = 7;
-            let equalSign = 0
-            let baseUrl = ''
-            let flag = true
-            while (flag) {
-        
-                if (url.slice(l,r) === 'deploy='){
-                    baseUrl = url.slice(l,r)
-                    equalSign = r
-                    flag = false
-                }
-                else{
-                    l+=1;
-                    r+=1;
-                }
-            }
-        
-            flag = true
-            while (flag) {
-        
-                if (url[equalSign] === '&'){
-                    url = url.slice(0, equalSign)
-                    flag = false
-                }
-                
-                else if (equalSign > url.length){
-                    url = url
-                    flag = false
-                }
-        
-                equalSign +=1
-            }
-            return url;
+            return suiteletUrl;
         }
-        
-
 
     /**
      * Function to be executed after page is initialized.
@@ -144,7 +113,7 @@ define(['N/currentRecord', 'N/record'],
         pageInit: pageInit,
         filterAll: filterAll,
         noSelections : noSelections,
-        findBaseUrl : findBaseUrl
+        getBaseURL: getBaseURL
         };
     
     });

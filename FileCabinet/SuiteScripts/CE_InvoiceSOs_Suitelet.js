@@ -3,7 +3,7 @@
  * @NScriptType Suitelet
  */
 
-// Purpose of Suitelet is to invoice any selected sales orders (which can be filtered by customers (multiselect) and individual sales order (checkbox))
+// Purpose of Suitelet is to invoice any selected sales orders (which can be filtered by customer, amount, and status)
 
 define(['N/file', 'N/render', 'N/search', 'N/record', 'N/ui/serverWidget', 'N/task', 'N/url', 'N/runtime', '/SuiteScripts/CE_Invoice_SalesOrders_Suitelet/CE_InvoiceSOs_Common'],
  /**
@@ -29,16 +29,8 @@ define(['N/file', 'N/render', 'N/search', 'N/record', 'N/ui/serverWidget', 'N/ta
             if (request.method == 'GET'){
 
                 let mrTask = request.parameters.mr_task_id;
-                let letterCheck = request.parameters.customers_filtered;
-                let status = request.parameters.status;
-                log.debug('status', status);
-                log.debug('status Type', typeof status);
 
-
-                if (letterCheck == 'AAA') {
-                    common.errorNoCustomersToFilter(response);
-                }
-                else if (mrTask) { //check if map/reduce has started running
+                if (mrTask) { //check if map/reduce has started running
 
                     let statusOfMr = task.checkStatus({
                         taskId: mrTask
@@ -50,7 +42,7 @@ define(['N/file', 'N/render', 'N/search', 'N/record', 'N/ui/serverWidget', 'N/ta
                         common.populateFinalSublist(finalInvoiceForm);                        
                         common.mrProcessingComplete(response);
                     }
-                    else {  //writes invoice still processing page
+                    else {  // write still processing page
                         common.mrStillProcessing(statusOfMr, response)
                     }
                 }
@@ -73,7 +65,7 @@ define(['N/file', 'N/render', 'N/search', 'N/record', 'N/ui/serverWidget', 'N/ta
                     
                     //Write landing page
                     
-                    //Initializes landing page form
+                    //Initialize landing page form
                     const invoiceForm = common.initializeForm(context, request);
 
                     //Gather data for landing page form
@@ -93,33 +85,22 @@ define(['N/file', 'N/render', 'N/search', 'N/record', 'N/ui/serverWidget', 'N/ta
 
                 //Processes data from landing page form
                 let selectedSalesOrders = request.parameters.custpage_sales_ordersdata;
-                log.debug('POST (FORM) soData suitelet file 96 -- before processed', selectedSalesOrders)
-
-
                 let soData = common.salesOrderSelectionData(selectedSalesOrders);  
-
-
-                log.debug('POST (FORM) soData suitelet file 102 -- afterProcessed', soData)
                 
                 // If no Sales Orders have been checked before the Invoicing button
-                //      is clicked, renders page with error message and button to return
+                //      is clicked, render page with error message and button to return
                 //      to landing page.
                 if (soData.soOrderNums === '') {
                     common.noSalesOrdersSelected(request, response);
                 }
 
                 else {
-                
-                // Runs map/reduce
-                // common.runMapReduce(soData.soIdAndNumber);
+                // Run map/reduce
+                common.runMapReduce(soData.soIdAndNumber);
                 }
     
             }
         }
-
-        
-
-
 
         return {onRequest}
     }
