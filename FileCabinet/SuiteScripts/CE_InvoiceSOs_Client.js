@@ -46,19 +46,11 @@ define(['N/currentRecord', 'N/record'],
             window.location.href = urlBase + customerURL + statusURL + greaterURL + lessURL;
         }
 
-        /** Error handling when user clicks Invoice All button without having checked any sales orders to invoice*/
-        
-        //Get base URL from custom record to simplify functions in this file
+        // Error handling when user clicks Invoice Selected Sales Orders button 
+                //without having checked any sales orders to invoice
         function noSelections (event) {
 
-            const fetchSuiteletUrl = record.load({
-                type : 'customrecord_ce_inv_mr_results',
-                id: 1
-            });
-
-            let suiteletUrl = fetchSuiteletUrl.getValue({
-                fieldId : 'custrecord_suitlet_base_url'
-            });
+            let suiteletUrl = getBaseURL();
 
             let currentRec = currentRecord.get();
             let hiddenCustIds = currentRec.getValue({
@@ -74,7 +66,8 @@ define(['N/currentRecord', 'N/record'],
                     window.location.href = suiteletUrl;
                 }
                 //Allows any filtered customer id's to persist, when button clicked to return to start page, 
-                //    after Invoice All button clicked with no SO's checked
+                //    after Invoice Selected Sales Orders button clicked with no SO's checked
+                //<> Add functionality by making sure other filters (besides customers) persist. To do so, will need to add hidden fields to function noSalesOrdersSelected
                 else {
                     hiddenCustIds = hiddenCustIds.replaceAll('\u0005',',');           
                     window.location.href = suiteletUrl + '&customers_filtered=' + hiddenCustIds
@@ -83,6 +76,7 @@ define(['N/currentRecord', 'N/record'],
             }
         }
 
+        //Get base URL from custom record to simplify other functions in this file
         function getBaseURL() {
             const fetchSuiteletUrl = record.load({
                 type : 'customrecord_ce_inv_mr_results',
