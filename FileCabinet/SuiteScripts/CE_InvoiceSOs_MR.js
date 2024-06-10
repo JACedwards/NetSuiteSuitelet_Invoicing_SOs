@@ -33,6 +33,8 @@ define(['N/query', 'N/record', 'N/runtime'],
                 
             //Old data must be cleared from custom record.  Otherwise, new data will be concatenated
             //      onto old data on the custom record from when M/R was last run.
+
+            //<>should be able to set this without loading.
             const custRecClear = record.load({
                 type : 'customrecord_ce_inv_mr_results',
                 id: 1

@@ -1,5 +1,6 @@
 /**
- * @NApiVersion 2.x
+ * @NApiVersion 2.1
+ * Account would not let me create script record without a script type; decided just to add these to the bottom of suietlet script
  */
 
 define(['N/currentRecord', 'N/file', 'N/format/i18n', 'N/query', 'N/record', 'N/redirect', 'N/render', 'N/runtime', 'N/search', 'N/task', 'N/ui/serverWidget', 'N/url', 'N/format/i18n'],
@@ -658,7 +659,8 @@ define(['N/currentRecord', 'N/file', 'N/format/i18n', 'N/query', 'N/record', 'N/
 
             return baseURL[0];
 
-        } 
+        }
+    
                
     //<>Some of these won't need to be returned since only being used within this file now.
     return {
@@ -678,6 +680,7 @@ define(['N/currentRecord', 'N/file', 'N/format/i18n', 'N/query', 'N/record', 'N/
         mrStillProcessing : mrStillProcessing,
         // errorNoCustomersToFilter : errorNoCustomersToFilter,
         getAccountURL: getAccountURL
+       
  
     }
         
