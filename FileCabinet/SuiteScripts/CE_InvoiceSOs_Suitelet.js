@@ -602,9 +602,9 @@ define(['N/currentRecord', 'N/file', 'N/format/i18n', 'N/query', 'N/record', 'N/
                 functionName : 'noSelections'
             });
 
-            //Facilitates persistence of earlier customer filters
+            //Facilitates persistence of filter values.
             //   if Invoice All button is clicked without any SO's being checkboxed
-            hiddenCustData=form.addField({
+            let hiddenCustData=form.addField({
                 id: 'custpage_hidden_cust_filter',
                 type: serverWidget.FieldType.TEXT,
                 label: 'Hidden customer data',
@@ -614,6 +614,46 @@ define(['N/currentRecord', 'N/file', 'N/format/i18n', 'N/query', 'N/record', 'N/
             });
             let hiddenCustomers = request.parameters.custpage_multiselect;
             hiddenCustData.defaultValue = hiddenCustomers;
+            
+
+            //<>Adding additional fields for persistence if INvoicing button clicked without checked sales orders
+
+            let hiddenGreaterData=form.addField({
+                id: 'custpage_hidden_more_filter',
+                type: serverWidget.FieldType.TEXT,
+                label: 'Hidden greater than amount',
+            });
+            hiddenGreaterData.updateDisplayType({
+                displayType : serverWidget.FieldDisplayType.HIDDEN
+            });
+            let hiddenGreaterAmount = request.parameters.custpage_greaterthan;
+            hiddenGreaterData.defaultValue = hiddenGreaterAmount;
+
+
+
+            let hiddenLessData=form.addField({
+                id: 'custpage_hidden_less_filter',
+                type: serverWidget.FieldType.TEXT,
+                label: 'Hidden Less than amount',
+            });
+            hiddenLessData.updateDisplayType({
+                displayType : serverWidget.FieldDisplayType.HIDDEN
+            });
+            let hiddenLessAmount = request.parameters.custpage_lessthan;
+            hiddenLessData.defaultValue = hiddenLessAmount;
+
+
+
+            let hiddenStatusData=form.addField({
+                id: 'custpage_hidden_status_filter',
+                type: serverWidget.FieldType.TEXT,
+                label: 'Hidden Status data',
+            });
+            hiddenStatusData.updateDisplayType({
+                displayType : serverWidget.FieldDisplayType.HIDDEN
+            });
+            let hiddenStatus = request.parameters.custpage_selectstatus;
+            hiddenStatusData.defaultValue = hiddenStatus;
             
             response.writePage({
                 pageObject: form

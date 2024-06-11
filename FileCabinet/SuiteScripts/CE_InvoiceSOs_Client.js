@@ -53,28 +53,67 @@ define(['N/currentRecord', 'N/record'],
             let suiteletUrl = getBaseURL();
 
             let currentRec = currentRecord.get();
+
+            debugger;
+            console.log(currentRec);
+
             let hiddenCustIds = currentRec.getValue({
                 fieldId: 'custpage_hidden_cust_filter'
             });
             
-            if (hiddenCustIds === undefined){
-                window.location.href = suiteletUrl;
+            if (hiddenCustIds === undefined || hiddenCustIds === ''){
+                hiddenCustIds = '';
+            }
+
+            else {
+                hiddenCustIds = '&customers_filtered=' + hiddenCustIds.replaceAll('\u0005',',')
+            }
+
+            let hiddenGreaterAmount = currentRec.getValue({
+                fieldId: 'custpage_hidden_more_filter'
+            });
+            
+            if (hiddenGreaterAmount === undefined || hiddenGreaterAmount === ''){
+                hiddenGreaterAmount = '';
+            }
+
+            else {
+                hiddenGreaterAmount = '&greater=' + hiddenGreaterAmount
+            }
+
+            let hiddenLesserAmount = currentRec.getValue({
+                fieldId: 'custpage_hidden_less_filter'
+            });
+            
+            if (hiddenLesserAmount === undefined || hiddenLesserAmount === ''){
+                hiddenLesserAmount = '';
+            }
+
+            else {
+                hiddenLesserAmount = '&less=' + hiddenLesserAmount
+            }
+
+            let hiddenStatus = currentRec.getValue({
+                fieldId: 'custpage_hidden_status_filter'
+            });
+            
+            if (hiddenStatus === undefined || hiddenStatus === ''){
+                hiddenStatus = '';
+            }
+
+            else {
+                hiddenStatus = '&status=' + hiddenStatus
             }
                 
-            else {
-                if (hiddenCustIds === ''){
-                    window.location.href = suiteletUrl;
-                }
-                //Allows any filtered customer id's to persist, when button clicked to return to start page, 
-                //    after Invoice Selected Sales Orders button clicked with no SO's checked
-                //<> Add functionality by making sure other filters (besides customers) persist. To do so, will need to add hidden fields to function noSalesOrdersSelected
-                else {
-                    hiddenCustIds = hiddenCustIds.replaceAll('\u0005',',');           
-                    window.location.href = suiteletUrl + '&customers_filtered=' + hiddenCustIds
-                }
+            console.log(hiddenCustIds);
+            console.log(hiddenGreaterAmount);
+            console.log(hiddenLesserAmount);
+            console.log(hiddenStatus);       
+            window.location.href = suiteletUrl + hiddenCustIds + hiddenGreaterAmount + hiddenLesserAmount + hiddenStatus
+                
 
-            }
         }
+        
 
         //Get base URL from custom record to simplify other functions in this file
         function getBaseURL() {
