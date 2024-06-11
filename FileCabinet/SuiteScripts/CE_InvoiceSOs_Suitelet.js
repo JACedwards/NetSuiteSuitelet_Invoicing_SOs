@@ -316,6 +316,12 @@ define(['N/currentRecord', 'N/file', 'N/format/i18n', 'N/query', 'N/record', 'N/
                 label : 'Filter',
                 functionName : 'filterAll'
             });
+
+            form.addButton({ 
+                id : 'clear_filters',
+                label : 'Clear Filters',
+                functionName : 'clearFilters'
+            });
             
             const soSublist = form.addSublist({
                 id : 'custpage_sales_orders',
@@ -744,21 +750,6 @@ define(['N/currentRecord', 'N/file', 'N/format/i18n', 'N/query', 'N/record', 'N/
             });
         }
 
-        // function errorNoCustomersToFilter(response){
-        //     const form = serverWidget.createForm({
-        //         title : 'Before using the "Filter by Customer" button, please choose customers in the CUSTOMER FILTER box.'
-        //     });
-        //     form.clientScriptModulePath = '/SuiteScripts/CE_InvoiceSOs_Client.js' 
-        //     form.addButton({
-        //         id : 'filter',
-        //         label : 'Return to Invoicing Page',
-        //         functionName : 'noSelections'
-        //     });
-        //     response.writePage({
-        //         pageObject: form
-        //     });
-        // }
-
         function getAccountURL () {
 
             const fetchSuiteletUrl = record.load({
@@ -778,10 +769,6 @@ define(['N/currentRecord', 'N/file', 'N/format/i18n', 'N/query', 'N/record', 'N/
 
         return {onRequest}
     }
-
-
-    // Support functions
-
     
 );
 

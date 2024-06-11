@@ -46,6 +46,14 @@ define(['N/currentRecord', 'N/record'],
             window.location.href = urlBase + customerURL + statusURL + greaterURL + lessURL;
         }
 
+        function clearFilters (event) {
+
+            let suiteletUrl = getBaseURL();
+
+            window.location.href = suiteletUrl
+
+        }
+        
         // Error handling when user clicks Invoice Selected Sales Orders button 
                 //without having checked any sales orders to invoice
         function noSelections (event) {
@@ -104,14 +112,9 @@ define(['N/currentRecord', 'N/record'],
             else {
                 hiddenStatus = '&status=' + hiddenStatus
             }
-                
-            console.log(hiddenCustIds);
-            console.log(hiddenGreaterAmount);
-            console.log(hiddenLesserAmount);
-            console.log(hiddenStatus);       
+                  
             window.location.href = suiteletUrl + hiddenCustIds + hiddenGreaterAmount + hiddenLesserAmount + hiddenStatus
                 
-
         }
         
 
@@ -145,6 +148,7 @@ define(['N/currentRecord', 'N/record'],
     return {
         pageInit: pageInit,
         filterAll: filterAll,
+        clearFilters: clearFilters,
         noSelections : noSelections,
         getBaseURL: getBaseURL
         };
