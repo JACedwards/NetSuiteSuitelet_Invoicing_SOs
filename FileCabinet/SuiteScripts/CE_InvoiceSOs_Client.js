@@ -41,9 +41,21 @@ define(['N/currentRecord', 'N/record'],
                 fieldId: 'custpage_lessthan'
             });
             let lessURL = '&less=' + amountLessThan;
+
+            // Supply pop-up if greater than amount is more than less than amount.
+            if (amountGreaterThan > amountLessThan) {
+
+                alert(`No Sales Orders fit these filters because the greater than amount (${amountGreaterThan}) is higher than the less than amount (${amountLessThan}). Please adjust those values appropriately`);
+
+                window.onbeforeunload = null;
+                window.location.href = urlBase + customerURL + statusURL + greaterURL + lessURL;
+            }
+
+            else {
   
             window.onbeforeunload = null;
             window.location.href = urlBase + customerURL + statusURL + greaterURL + lessURL;
+            }
         }
 
         function clearFilters (event) {
@@ -61,9 +73,6 @@ define(['N/currentRecord', 'N/record'],
             let suiteletUrl = getBaseURL();
 
             let currentRec = currentRecord.get();
-
-            debugger;
-            console.log(currentRec);
 
             let hiddenCustIds = currentRec.getValue({
                 fieldId: 'custpage_hidden_cust_filter'

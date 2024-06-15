@@ -5,7 +5,7 @@
 
 // Purpose of Suitelet is to invoice any selected sales orders (which can be filtered by customer, amount, and status)
 
-define(['N/currentRecord', 'N/file', 'N/format/i18n', 'N/query', 'N/record', 'N/redirect', 'N/render', 'N/runtime', 'N/search', 'N/task', 'N/ui/serverWidget', 'N/url', 'N/format/i18n'],
+define(['N/currentRecord', 'N/file', 'N/query', 'N/record', 'N/redirect', 'N/render', 'N/runtime', 'N/search', 'N/task', 'N/ui/serverWidget', 'N/url', 'N/format/i18n'],
  /**
  * @param {currentRecord} currentRecord
  * @param {file} file
@@ -24,7 +24,7 @@ define(['N/currentRecord', 'N/file', 'N/format/i18n', 'N/query', 'N/record', 'N/
  * @param {ServerResponse} context.response - Suitelet response
  */
 
-    (currentRecord, file, i18n, query, record, redirect, render, runtime, search, task, serverWidget, url, format) => {
+    (currentRecord, file, query, record, redirect, render, runtime, search, task, serverWidget, url, format) => {
 
         const onRequest = (context) => {            
             const request = context.request;
@@ -146,25 +146,30 @@ define(['N/currentRecord', 'N/file', 'N/format/i18n', 'N/query', 'N/record', 'N/
 
             let customFilterQuery;
             let statusQuery;
+            let filter = false;
 
             // filter by status
             if (status == undefined || status == '0') {
-                statusQuery = `('Sales Order : Partially Fulfilled', 'Sales Order : Pending Billing/Partially Fulfilled ', 'Sales Order : Pending Billing')`
+                statusQuery = `('Sales Order : Partially Fulfilled', 'Sales Order : Pending Billing/Partially Fulfilled ', 'Sales Order : Pending Billing')`;
             }
             else if (status == '1') {
-                statusQuery = `('Sales Order : Partially Fulfilled')`
+                statusQuery = `('Sales Order : Partially Fulfilled')`;
+                filter = true;
             }
             else if (status == '2') {
-                statusQuery = `('Sales Order : Pending Billing/Partially Fulfilled ')`
+                statusQuery = `('Sales Order : Pending Billing/Partially Fulfilled ')`;
+                filter = true;
             }
             if (status == '3') {
                 statusQuery = `('Sales Order : Pending Billing')`
+                filter = true;
             }
 
             // filter by customer
             if (filteredCustomers !== 'AAA' && filteredCustomers !== undefined && filteredCustomers.length !== 0) {
                 let custIds = filteredCustomers.split(',').map(e => e = parseInt(e));
                 customFilterQuery = ` AND entity IN (${custIds})`
+                filter = true;
             }
 
             let baseQuery = `SELECT 
@@ -186,13 +191,15 @@ define(['N/currentRecord', 'N/file', 'N/format/i18n', 'N/query', 'N/record', 'N/
             if (greaterThan.length != 0) {
                 baseQuery = baseQuery + 
                 `AND
-                    foreigntotal > ${parseInt(greaterThan)}`
+                    foreigntotal > ${parseInt(greaterThan)}`;
+                filter = true;
             }
             //Filter by amount less than                   
             if (lessThan.length != 0) {
                 baseQuery = baseQuery + 
                 `AND
-                    foreigntotal < ${parseInt(lessThan)}`
+                    foreigntotal < ${parseInt(lessThan)}`;
+                filter = true;
             }
             
             const results = query.runSuiteQLPaged({
@@ -216,7 +223,13 @@ define(['N/currentRecord', 'N/file', 'N/format/i18n', 'N/query', 'N/record', 'N/
             });
             return true;
             });
-            log.debug('objectArray at commmon 143', objectArray)
+            log.debug('objectArray at commmon 143', objectArray);
+
+            if (filter == true && objectArray.length == 0) {
+                    //<> figuring out if need to return object
+                    //   that includes the object array and whether filter flag
+                    //  is false or true
+            }
 
             return objectArray;
         }
@@ -234,6 +247,24 @@ define(['N/currentRecord', 'N/file', 'N/format/i18n', 'N/query', 'N/record', 'N/
                 id : 'invoice_all',
                 label : 'Invoice Selected Sales Orders',
             });
+
+            //<> working on message for when filters result in no sales orders at all
+            //  Next Steps:
+                    //(1) make this an inline html field so cancan make red/bold (and hopefully get rid of "label"
+                    //(2):  use filter flag I've added to getData() to set this field to hidden in the populateForm() function if a filter has been used.
+                        //because don't want this message about a filter to appear if no filters have been set.
+
+
+            // let noSalesOrdersInsideFilters = form.addField({
+            //     id : 'custpage_nososinsidefilter',
+            //     type : serverWidget.FieldType.TEXT,
+            //     label : 'Alert'
+            // });
+            // noSalesOrdersInsideFilters.defaultValue = 'No Sales Orders fall within the criteria of the specified filters.  Please adjust filters as appropriate';
+
+            //<>end of no sales orders in filture code
+
+            
 
             let multiSelect = form.addField({
                 id : 'custpage_multiselect',
@@ -621,9 +652,6 @@ define(['N/currentRecord', 'N/file', 'N/format/i18n', 'N/query', 'N/record', 'N/
             let hiddenCustomers = request.parameters.custpage_multiselect;
             hiddenCustData.defaultValue = hiddenCustomers;
             
-
-            //<>Adding additional fields for persistence if INvoicing button clicked without checked sales orders
-
             let hiddenGreaterData=form.addField({
                 id: 'custpage_hidden_more_filter',
                 type: serverWidget.FieldType.TEXT,
@@ -635,8 +663,6 @@ define(['N/currentRecord', 'N/file', 'N/format/i18n', 'N/query', 'N/record', 'N/
             let hiddenGreaterAmount = request.parameters.custpage_greaterthan;
             hiddenGreaterData.defaultValue = hiddenGreaterAmount;
 
-
-
             let hiddenLessData=form.addField({
                 id: 'custpage_hidden_less_filter',
                 type: serverWidget.FieldType.TEXT,
@@ -647,8 +673,6 @@ define(['N/currentRecord', 'N/file', 'N/format/i18n', 'N/query', 'N/record', 'N/
             });
             let hiddenLessAmount = request.parameters.custpage_lessthan;
             hiddenLessData.defaultValue = hiddenLessAmount;
-
-
 
             let hiddenStatusData=form.addField({
                 id: 'custpage_hidden_status_filter',
@@ -683,20 +707,20 @@ define(['N/currentRecord', 'N/file', 'N/format/i18n', 'N/query', 'N/record', 'N/
             return { soOrderNums, soIdAndNumber }
         }
 
-        function errorNoSoSelects(){
-            const form = serverWidget.createForm({
-                title : 'Please use checkboxes to select specific Sales Orders before clicking the "Invoice" button.'
-            });
-            form.clientScriptModulePath = '/SuiteScripts/CE_InvoiceSOs_Client.js'
-            form.addButton({
-                id : 'filter',
-                label : 'Return to Invoicing Page',
-                functionName : 'noSelections'
-            });
-            response.writePage({
-                pageObject: form
-            });
-        }
+        // function errorNoSoSelects(){
+        //     const form = serverWidget.createForm({
+        //         title : 'Please use checkboxes to select specific Sales Orders before clicking the "Invoice" button.'
+        //     });
+        //     form.clientScriptModulePath = '/SuiteScripts/CE_InvoiceSOs_Client.js'
+        //     form.addButton({
+        //         id : 'filter',
+        //         label : 'Return to Invoicing Page',
+        //         functionName : 'noSelections'
+        //     });
+        //     response.writePage({
+        //         pageObject: form
+        //     });
+        // }
 
         function mrProcessingComplete(response){
             const finalInvoiceForm = initializeFinalForm();
