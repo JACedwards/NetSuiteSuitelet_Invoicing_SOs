@@ -83,7 +83,7 @@ define(['N/query', 'N/record', 'N/runtime'],
                 });
 
                 //Load new invoice, grab its id and number, and put in object:
-                //      {pair: [sales order number, invoice number, invoice id, sales order id]}
+                //      {"pair": [sales order number, invoice number, invoice id, sales order id]}
                 let invoiceRecord = record.load({
                     type: record.Type.INVOICE,
                     id : invoiceId,
