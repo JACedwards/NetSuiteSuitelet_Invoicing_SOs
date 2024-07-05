@@ -45,7 +45,7 @@ define(['N/currentRecord', 'N/record'],
             // Supply pop-up if greater than amount is more than less than amount.
             if (amountGreaterThan > amountLessThan) {
 
-                alert(`No Sales Orders fit these filters because the greater than amount (${amountGreaterThan}) is higher than the less than amount (${amountLessThan}). Please adjust those values appropriately`);
+                alert(`No Sales Orders fit these filters because the greater than amount ($${amountGreaterThan}) is higher than the less than amount ($${amountLessThan}). Please adjust those values appropriately`);
 
                 window.onbeforeunload = null;
                 window.location.href = urlBase + customerURL + statusURL + greaterURL + lessURL;
